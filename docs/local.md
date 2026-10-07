@@ -12,7 +12,7 @@ oni init --alias local --port 18181
 
 성공하면 `로컬 인스턴스를 만들었습니다.`와 주소·MCP·설정·데이터 경로가 나옵니다. 주소는 `http://127.0.0.1:18181`, MCP는 `http://127.0.0.1:18181/mcp`입니다. `이미 초기화`라면 기존 설정을 지우지 말고 다음 기동 단계로 가세요. 포트 충돌이면 [문제 해결](troubleshooting.md)을 봅니다.
 
-## 2. 시작하고 주인으로 로그인
+## 2. 시작하고 웹 열기
 
 ```sh
 oni daemon start
@@ -21,9 +21,9 @@ curl -fsS http://127.0.0.1:18181/ready
 oni open
 ```
 
-기대 결과는 `started pid=<숫자>`, `running pid=<숫자>`, `/ready` HTTP 200입니다. `starting pid=…`이면 아직 준비 중이므로 잠시 뒤 `/ready`를 다시 확인하세요. `oni open`은 실행 중인 데몬에서 2분·1회용 로그인 링크를 받아 브라우저를 엽니다. 데몬이 꺼져 있으면 먼저 `oni daemon start`를 실행합니다.
+기대 결과는 `started pid=<숫자>`, `running pid=<숫자>`, `/ready` HTTP 200입니다. `starting pid=…`이면 아직 준비 중이므로 잠시 뒤 `/ready`를 다시 확인하세요. `oni open`은 실행 중인 데몬에서 2분·1회용 링크를 받아 로그인 화면 없이 주인의 웹 화면을 엽니다. 데몬이 꺼져 있으면 먼저 `oni daemon start`를 실행합니다.
 
-기본 동작은 본인만 읽는 runtime 폴더에 `0600` HTML 파일을 만들고, 브라우저가 그 파일에서 로그인 링크로 이동하는 방식입니다. 로그인 토큰을 OS 열기 명령의 인자에 넣지 않습니다. 이전에 만든 5분 지난 파일은 다음 실행 때 정리합니다. Wiki 화면에서 Space를 만들거나 사용할 Space를 선택하고 문서 하나를 저장·재조회하여 첫 사용을 확인하세요.
+기본 동작은 본인만 읽는 runtime 폴더에 `0600` HTML 파일을 만들고, 브라우저가 그 파일에서 로그인 링크로 이동하는 방식입니다. 로그인 토큰을 OS 열기 명령의 인자에 넣지 않습니다. 이전에 만든 5분 지난 파일은 다음 실행 때 정리합니다. 로컬 웹 세션의 수명은 365일이며 사용하면 만료 시각이 갱신됩니다. 데몬 재시작과 바이너리 업데이트 뒤에도 유지됩니다. 세션이 만료되거나 브라우저 쿠키를 지웠다면 `oni open`을 다시 실행합니다. Wiki 화면에서 Space를 만들거나 사용할 Space를 선택하고 문서 하나를 저장·재조회하여 첫 사용을 확인하세요.
 
 다른 화면으로 바로 가려면 `oni open /settings/account`처럼 인스턴스 안의 `/`로 시작하는 경로를 줍니다. 전체 외부 URL은 받지 않습니다. 브라우저가 숨김 폴더의 파일에 접근할 수 없는 경우(예: Linux snap 브라우저)에는 다음처럼 링크를 직접 넘깁니다.
 
@@ -42,16 +42,16 @@ oni open --print
 설정 파일은 사용자별입니다. AI 클라이언트를 실행할 것과 같은 OS 사용자·HOME에서 진행하세요. init만으로 AI 연결이 등록되지는 않습니다.
 
 ```sh
-oni connection add --alias local --url http://127.0.0.1:18181/mcp --mode WRITE
-oni login --connection local
-oni register claude --connection local
-oni register codex --connection local
+oni register claude
+oni register codex
 oni doctor --connection local
 ```
 
-설치한 AI 클라이언트의 register 줄만 실행합니다. 로컬 인스턴스와 연결 URL이 일치하면 login이 일회용 로컬 로그인 링크를 자동으로 받아 동의 화면을 엽니다. 별도의 onidot 계정 로그인은 없습니다. 브라우저가 파일을 열지 못하면 `oni login --connection local --direct`로 다시 시작합니다. 브라우저에서 **이 로컬 인스턴스**, 실제 작업할 Space, WRITE 권한을 확인하고 승인하세요. 성공 출력은 `local`과 `WRITE`입니다. register는 `registered claude onidot-local` 또는 `registered codex onidot-local`을 출력하며, 같은 등록이면 `unchanged …`입니다. 같은 이름에 다른 연결이 있으면 덮어쓰지 않으므로 충돌을 먼저 해결합니다. 공식 AI 클라이언트 명령은 자체 캐시나 빈 설정 배열을 정규화할 수 있습니다. 등록 과정에서 기존 설정 보존 확인 오류가 나오면 항목을 무작정 다시 추가하지 말고 실제 등록과 백업 차이를 먼저 확인하세요.
+설치한 AI 클라이언트의 register 줄만 실행합니다. 별칭을 생략하면 초기화한 로컬 인스턴스의 별칭을 사용합니다. 예시와 다른 별칭으로 초기화했다면 doctor의 `--connection`에도 그 별칭을 사용하세요. 초기화한 로컬 인스턴스에 연결을 자동으로 만들므로 `oni connection add`나 `oni login`, 브라우저 동의가 필요하지 않습니다. OS 사용자만 읽을 수 있는 `0600` 로컬 토큰으로 WRITE 연결을 만들며, 모든 모듈의 읽기·쓰기(앞으로 추가될 모듈 포함)를 허용합니다. 관리 행동은 이 범위에 포함되지 않으며 Space 구성원·권한 검사는 유지됩니다. 사용 중 토큰 갱신은 자동으로 처리합니다. 토큰 파일이 없을 때만 자격 증명을 자동 발급합니다. 폐기된 연결, 갱신이 거절된 연결, 갱신 결과가 확정되지 않은 연결은 자동으로 되살리지 않습니다. 새 자격 증명을 발급하려면 데몬을 실행하고 `oni register claude --reissue` 또는 `oni register codex --reissue`를 명시합니다. 재발급 여부는 출력으로 확인할 수 있으며, 같은 별칭의 기존 자격 증명은 폐기됩니다. 브라우저 동의는 필요하지 않습니다. 이미 설정된 연결을 `--connection local`처럼 명시하면 데몬이 꺼져 있어도 클라이언트 등록은 유지할 수 있으나, 실제 연결 확인에는 데몬이 필요합니다.
 
-doctor는 OAuth 메타데이터·MCP initialize·tools/list·list_spaces를 확인합니다. WRITE 도구와 승인한 Space가 보여야 합니다. 로그인 전에는 `로그인하지 않았습니다`와 종료 코드 1이 정상적인 진단입니다. 등록 성공만으로 AI가 실제 도구를 호출했다고 보지는 마세요.
+register는 `registered claude onidot-local` 또는 `registered codex onidot-local`을 출력하며, 같은 등록이면 `unchanged …`입니다. 같은 이름에 다른 연결이 있으면 덮어쓰지 않으므로 충돌을 먼저 해결합니다. 공식 AI 클라이언트 명령은 자체 캐시나 빈 설정 배열을 정규화할 수 있습니다. 등록 과정에서 기존 설정 보존 확인 오류가 나오면 항목을 무작정 다시 추가하지 말고 실제 등록과 백업 차이를 먼저 확인하세요.
+
+doctor는 OAuth 메타데이터·MCP initialize·tools/list·list_spaces를 확인합니다. WRITE 도구와 접근 가능한 Space가 보여야 합니다. 등록 전에 연결이나 토큰이 없으면 먼저 위 register 명령을 실행합니다. 등록 성공만으로 AI가 실제 도구를 호출했다고 보지는 마세요.
 
 AI 클라이언트에서 새 대화를 열어 다음처럼 요청합니다.
 
@@ -99,7 +99,7 @@ oni daemon status
 
 기대 출력은 `자동 시작을 해제했습니다. 데이터는 보존했습니다.`입니다. 실패하면 등록 파일을 임의로 지우지 말고 오류를 확인하세요. 다시 수동 사용하려면 `oni daemon start`를 실행합니다. 자동 시작이 활성일 때 단순 daemon stop만으로 서비스가 계속 멈춰 있을 것이라 가정하지 않습니다.
 
-로컬 로그인·문서 접근과 로컬 MCP 동의는 외부 로그인 제공자 없이 사용할 수 있습니다. 설치 파일 다운로드와 AI 서비스 이용에 필요한 네트워크는 별도입니다. 네트워크가 끊겼다고 원격이나 다른 인스턴스에 자동 저장하지 않습니다.
+로컬 웹과 AI 연결은 계정 로그인·브라우저 동의 없이 사용할 수 있습니다. 설치 파일 다운로드와 AI 서비스 이용에 필요한 네트워크는 별도입니다. 네트워크가 끊겼다고 원격이나 다른 인스턴스에 자동 저장하지 않습니다.
 
 ## 5. 백업과 복원
 
@@ -128,10 +128,11 @@ oni open
 
 이전 버전의 백업을 새 버전에서 복원할 때는 `oni restore /절대경로/백업 --upgrade`를 명시합니다. 원본의 파일 hash·migration checksum·instance ID를 먼저 검사하고 별도 staging root에서 순서대로 migration한 뒤 후보 이력을 다시 검사하여 활성화합니다. 기본 복원은 이력이 정확히 같은 백업만 받으며, `--upgrade`도 모르는 모듈·미래 버전·checksum 불일치를 허용하지 않습니다. 백업 원본과 이전 root는 보존합니다. guide·ledger 이력이 들어간 DB·백업은 이 모듈을 모르는 구 바이너리로 열거나 복원할 수 없습니다. 새 이력을 이해하는 호환 바이너리와 그 버전에 맞는 백업을 함께 보관하세요.
 
-복원은 주인·문서·권한·instance ID를 유지하고 기존 세션·MCP grant·PAT·미사용 일회 코드를 폐기합니다. `oni open`으로 기존 주인 계정에 로그인하세요. 새 주인 생성 절차가 아닙니다. 문서·첨부를 확인하고 다음 명령으로 AI 연결을 다시 승인합니다.
+복원은 주인·문서·권한·instance ID를 유지하고 기존 세션·MCP grant·PAT·미사용 일회 코드를 폐기합니다. `oni open`으로 기존 주인의 웹 화면을 여세요. 새 주인 생성 절차가 아닙니다. 문서·첨부를 확인하고 3절의 명시적 재발급으로 AI 연결을 복구합니다.
 
 ```sh
-oni login --connection local
+oni register claude --reissue
+# Codex를 사용하면 oni register codex --reissue
 oni doctor --connection local
 ```
 
@@ -144,15 +145,17 @@ oni restore /절대경로/백업묶음 \
   --instance-config /절대경로/안전하게-보관한-instance.json
 ```
 
-새 기기에서는 `oni init`으로 다른 인스턴스를 만들지 않고 위 복원부터 실행합니다. 이어서 `oni daemon start`·`oni doctor`·`oni open`으로 기존 주인과 문서·첨부를 확인한 뒤, 3절의 connection add·login·register로 그 기기의 AI 연결을 새로 구성합니다. 설정 사본은 원본 인스턴스의 비밀과 ID를 유지해야 합니다. 기존 config가 있는 기기에 `--instance-config`를 주어 덮어쓰지 않습니다. 복구 확인 후에도 이전 root·백업은 필요 기간 동안 보관합니다.
+새 기기에서는 `oni init`으로 다른 인스턴스를 만들지 않고 위 복원부터 실행합니다. 이어서 `oni daemon start`·`oni doctor`·`oni open`으로 기존 주인과 문서·첨부를 확인한 뒤, 3절의 register로 그 기기의 AI 연결을 새로 구성합니다. 설정 사본은 원본 인스턴스의 비밀과 ID를 유지해야 합니다. 기존 config가 있는 기기에 `--instance-config`를 주어 덮어쓰지 않습니다. 복구 확인 후에도 이전 root·백업은 필요 기간 동안 보관합니다.
 
 ## 업데이트와 되돌리기
 
 1. 대상 릴리스의 변경·migration·사용 조건을 읽고 현재 두 버전을 적어 둡니다. 새 archive와 SHA256SUMS를 [설치 안내](README.md#압축-파일로-설치하기)대로 검증·별도 압축 해제합니다.
 2. 위 백업과 `instance.json` 별도 보관을 끝내고 성공 여부를 확인합니다. 자동 시작을 설정했다면 먼저 그 사용자 서비스를 중지하여 재기동을 막습니다. `oni daemon stop` 후 `stopped`를 확인합니다.
 3. 기존 `oni`·`onidot-studio`를 함께 별도 복구 폴더에 복사합니다. 새 두 파일을 같은 `~/.local/bin`에 설치합니다. 설치기를 쓰면 아래 `--restart` 경로로 두 파일 교체·재기동·doctor를 확인합니다. 수동 설치 중 어느 한 파일 설치가 실패하면 기동하지 않고 이전 두 파일을 함께 되돌립니다.
-4. `oni version`, `onidot-studio version`이 같은 새 0.x 버전인지 확인하고 `oni daemon start`, `/ready`, 웹의 문서·첨부, `oni doctor --connection local`을 확인합니다. 등록 경로가 같으면 register를 새로 할 필요가 없습니다.
-5. 업데이트가 실패하면 새 데몬을 멈추고 로그를 확인합니다. DB가 이미 migration되었을 수 있으므로 옛 바이너리만 덮어서 새 DB를 열지 마세요. 이전 두 바이너리와 그 버전에 맞는 **업데이트 전 백업**·설정 사본으로 위 복원 절차를 수행한 뒤 로그인·MCP를 재인가합니다. 복원 전후 root를 지우지 않습니다.
+4. `oni version`, `onidot-studio version`이 같은 새 0.x 버전인지 확인하고 `oni daemon start`, `/ready`, 웹의 문서·첨부, `oni doctor --connection local`을 확인합니다. 등록 경로가 같으면 다시 로그인하거나 register를 새로 할 필요가 없습니다.
+5. 업데이트가 실패하면 새 데몬을 멈추고 로그를 확인합니다. DB가 이미 migration되었을 수 있으므로 옛 바이너리만 덮어서 새 DB를 열지 마세요. 이전 두 바이너리와 그 버전에 맞는 **업데이트 전 백업**·설정 사본으로 위 복원 절차를 수행한 뒤 `oni open`과 register로 웹·AI 연결을 복구합니다. 복원 전후 root를 지우지 않습니다.
+
+이미 로그인·등록한 로컬 사용자도 기존 인스턴스 설정·DB·토큰 파일과 설치 경로를 보존한 채 두 바이너리를 함께 업데이트합니다. 기존 연결은 계속 사용하며 재등록하지 않습니다. 기존 Wiki 전용 연결의 권한을 자동으로 넓히지는 않습니다. guide·ledger 등 새 모듈도 사용하려면 웹 설정 → 연결에서 해당 연결을 선택하고 **모든 모듈로 넓히기**를 누른 뒤 추가되는 권한과 줄어드는 권한을 확인하고 저장합니다. 기존 읽기·쓰기와 Wiki 관리 권한, 별도로 선택한 모듈 권한은 유지됩니다. 읽기 전용 연결에는 쓰기·관리를 추가하지 않으며, 모든 모듈 범위는 현재와 미래 모듈의 읽기·쓰기에만 적용됩니다. 새 모듈의 관리는 개별 모듈에서 별도로 선택합니다. 토큰을 재발급할 필요는 없습니다. 처음 등록하는 로컬 연결은 모든 모듈 읽기·쓰기를 사용합니다.
 
 설치기 업데이트 예시입니다. 위의 백업과 설정 보관을 완료한 뒤 실행하며, `0.6.1`과 URL은 실제 목표 릴리스로 바꿉니다.
 
@@ -181,9 +184,11 @@ bash install.sh --uninstall
 
 ### 작업 원장·가이드 CLI 연결
 
-새 원장·가이드 명령은 연결에 REST 주소와 인스턴스 ID를 명시해야 합니다.
-`oni connection add`의 `--rest-url`·`--instance-id`로 고정하고, 필요한 모듈 권한을
-OAuth 동의에서 선택합니다. 기존 Wiki 연결의 권한은 자동으로 확대되지 않습니다.
+새 원장·가이드 명령은 연결에 REST 주소와 인스턴스 ID가 필요합니다.
+로컬 register가 새로 만드는 연결에는 초기화한 인스턴스의 두 값이 자동으로 들어갑니다.
+기존 연결에 이 값이 없다면 `oni connection add`의 `--rest-url`·`--instance-id`로
+명시합니다. 기존 Wiki 전용 연결의 권한은 자동으로 확대되지 않으므로 웹 설정 → 연결에서
+필요한 모듈 권한을 변경하세요. 셀프호스팅 연결은 기존 OAuth 동의 절차를 사용합니다.
 명령별 입력은 `oni <명령> --help`에서 확인합니다.
 
 - `oni work …`, `oni handoff …`, `oni session context|bind`는 명시한
