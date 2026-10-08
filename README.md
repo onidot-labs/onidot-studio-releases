@@ -2,7 +2,9 @@
 
 onidot-studio는 문서와 AI 작업의 맥락을 자신이 선택한 인스턴스에 보관하는 개인 작업 플랫폼입니다. 패키지 하나에 사용자 명령 `oni`와 서버 명령 `onidot-studio`가 들어 있습니다. 두 명령은 같은 버전을 같은 디렉터리에 설치합니다.
 
-현재 공개 버전은 **0.1.5**입니다(첫 공개 0.1.0). 설치 파일은 [공개 릴리스](https://github.com/onidot-labs/onidot-studio-releases/releases/tag/v0.1.5)에서 받습니다. 0.1.5부터 새 버전이 나오면 연결한 AI·웹·`oni` 명령이 알려 주고, `oni update` 한 번으로 백업·설치·재시작을 합니다. 확인은 하루 한 번 공개 저장소에 묻는 것이며 `ONIDOT_UPDATE_CHECK=off`로 끌 수 있습니다. `oni update`는 0.1.5부터 있으므로 0.1.4 이하에서 올 때는 한 번만 빠른 설치와 같은 방법으로 0.1.5를 설치합니다. 0.1.4에서 웹·AI의 Space 만들기, 0.1.3에서 Space를 정하기 전에 기본 지침을 읽는 `get_onidot_guide`, 0.1.2에서 AI 기록·작업 체크리스트·모든 모듈 연결 권한·로그인 없는 로컬 인스턴스가 추가됐습니다.
+현재 공개 버전은 **0.1.6**입니다(첫 공개 0.1.0). 설치 파일은 [공개 릴리스](https://github.com/onidot-labs/onidot-studio-releases/releases/tag/v0.1.6)에서 받습니다. 0.1.5부터 새 버전이 나오면 연결한 AI·웹·`oni` 명령이 알려 주고, `oni update` 한 번으로 백업·설치·재시작을 합니다. 확인은 하루 한 번 공개 저장소에 묻는 것이며 `ONIDOT_UPDATE_CHECK=off`로 끌 수 있습니다. `oni update`는 0.1.5부터 있으므로 0.1.4 이하에서 올 때는 한 번만 빠른 설치와 같은 방법으로 최신 버전을 설치합니다. 0.1.4에서 웹·AI의 Space 만들기, 0.1.3에서 Space를 정하기 전에 기본 지침을 읽는 `get_onidot_guide`, 0.1.2에서 AI 기록·작업 체크리스트·모든 모듈 연결 권한·로그인 없는 로컬 인스턴스가 추가됐습니다.
+
+0.1.6에는 최종 답변 전 AI 기록 확인과 `oni recording-check`가 추가됐습니다. onidot 플러그인 **0.15.6** 이상과 함께 사용하면 지원되는 CLI에서 기록 누락 후보를 한 번 더 확인합니다. Codex 훅은 `/hooks`에서 사용자가 검토·신뢰해야 실행됩니다. 저장은 AI가 현재 Space·권한으로 수행하며, 기록할 내용이 없으면 억지로 저장하지 않습니다. 자세한 실행 조건과 한계는 [로컬 안내](docs/local.md)의 「AI 기록의 종료 확인」을 보세요.
 
 ## 사용 방법을 고르세요
 
@@ -37,7 +39,7 @@ uname -m
 ### 2. 내려받아 설치
 
 ```sh
-version=0.1.5
+version=0.1.6
 base="https://github.com/onidot-labs/onidot-studio-releases/releases/download/v$version"
 work=$(mktemp -d) && cd "$work"
 curl -fsSLO "$base/install.sh"
@@ -47,7 +49,7 @@ oni version
 onidot-studio version
 ```
 
-기대 결과: `설치 완료: 0.1.5 (<os>_<arch>)`, `oni 0.1.5`, `onidot-studio 0.1.5`. 설치 스크립트가 압축 파일을 `SHA256SUMS`로 검증합니다. 토큰·관리자 권한은 필요 없습니다.
+기대 결과: `설치 완료: 0.1.6 (<os>_<arch>)`, `oni 0.1.6`, `onidot-studio 0.1.6`. 설치 스크립트가 압축 파일을 `SHA256SUMS`로 검증합니다. 토큰·관리자 권한은 필요 없습니다.
 
 새 터미널에서 `oni`를 찾지 못하면, 사용자에게 확인한 뒤 셸 설정 파일에 `export PATH="$HOME/.local/bin:$PATH"` 한 줄을 더합니다.
 
@@ -153,7 +155,7 @@ AI 클라이언트를 **새 세션**으로 열고 이렇게 묻습니다.
 출시 공지의 공개 릴리스에서 자신의 OS·CPU에 맞는 압축 파일과 `SHA256SUMS`를 **새 빈 다운로드 폴더**에 받으세요. 주소를 임의로 추정하지 마세요. 아래는 macOS ARM64 예시이며 Linux에서는 파일명을 자신의 대상에 맞춥니다. 공개 준비 묶음의 archive에는 `oni`, `onidot-studio`, `README.md`, `LICENSE`와 `docs/`의 가이드 6개(`README`, `local`, `self-hosted`, `hybrid`, `troubleshooting`, `TERMS`)가 들어 있습니다. `install.sh`는 archive 밖의 별도 릴리스 파일입니다. 기존 설치가 있으면 먼저 [업데이트](docs/local.md#업데이트와-되돌리기)를 따르세요.
 
 ```sh
-version=0.1.5
+version=0.1.6
 target=darwin_arm64
 archive="onidot-studio_${version}_${target}.tar.gz"
 # macOS: 현재 폴더에 받은 파일만 검증합니다.
@@ -177,7 +179,7 @@ oni version
 onidot-studio version
 ```
 
-기대 결과는 각각 `oni 0.1.5`, `onidot-studio 0.1.5`입니다. 한 명령이 실패하거나 버전이 다르면 초기화·기동하지 말고 두 파일을 같은 압축 파일에서 다시 설치하세요. 심볼릭 링크로 연결하지 않습니다. macOS 실행 제한이 나오면 [문제 해결](docs/troubleshooting.md#macos에서-실행이-차단될-때)을 따릅니다.
+기대 결과는 각각 `oni 0.1.6`, `onidot-studio 0.1.6`입니다. 한 명령이 실패하거나 버전이 다르면 초기화·기동하지 말고 두 파일을 같은 압축 파일에서 다시 설치하세요. 심볼릭 링크로 연결하지 않습니다. macOS 실행 제한이 나오면 [문제 해결](docs/troubleshooting.md#macos에서-실행이-차단될-때)을 따릅니다.
 
 새 터미널에서도 찾도록 사용하는 셸의 시작 설정에 `export PATH="$HOME/.local/bin:$PATH"`를 한 번 추가하고 `command -v oni`를 확인하세요. 설치 명령은 두 실행 파일만 복사합니다. 오프라인에서도 읽으려면 압축 파일 또는 `README.md`·`LICENSE`·`docs/`를 함께 보관하세요. 임시 압축 해제 폴더는 두 명령 설치와 문서 보관이 확인된 뒤 그 폴더만 지워도 됩니다. 사용자 데이터 경로와 혼동하지 마세요.
 
@@ -194,7 +196,7 @@ oni version
 onidot-studio version
 ```
 
-기대 결과는 `설치 완료: 0.1.5 (<os>_<arch>)`, 설치 경로·PATH·init/start 안내입니다. 토큰·sudo는 필요하지 않습니다. 스크립트는 셸 설정이나 OS 자동 시작을 기본으로 바꾸지 않습니다. 지원하지 않는 OS/CPU·혼합 버전·checksum 불일치·부분 다운로드는 거부합니다. 같은 버전 재설치도 먼저 데몬을 멈추고, 자동 시작을 등록했다면 해제해야 합니다. 다른 버전 업데이트에는 [업데이트](docs/local.md#업데이트와-되돌리기)의 백업·정지 후 `--restart`를 사용합니다. 버전 내림은 자동 수행하지 않습니다.
+기대 결과는 `설치 완료: 0.1.6 (<os>_<arch>)`, 설치 경로·PATH·init/start 안내입니다. 토큰·sudo는 필요하지 않습니다. 스크립트는 셸 설정이나 OS 자동 시작을 기본으로 바꾸지 않습니다. 지원하지 않는 OS/CPU·혼합 버전·checksum 불일치·부분 다운로드는 거부합니다. 같은 버전 재설치도 먼저 데몬을 멈추고, 자동 시작을 등록했다면 해제해야 합니다. 다른 버전 업데이트에는 [업데이트](docs/local.md#업데이트와-되돌리기)의 백업·정지 후 `--restart`를 사용합니다. 버전 내림은 자동 수행하지 않습니다.
 
 ## 데이터와 사용 조건
 
