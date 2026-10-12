@@ -1,10 +1,10 @@
 # 셀프호스팅 인스턴스를 여러 기기에서 사용하기
 
-서버 기기에 PostgreSQL·첨부를 두고 다른 기기의 웹·AI 도구에서 접속하는 경로입니다. 이 가이드는 **Docker로 전용 PostgreSQL을 실행하고 네이티브 `onidot-studio` 서버를 실행**하는 구성을 기준으로 합니다. SQLite의 loopback 서버를 외부에 노출하는 방식은 아닙니다. 물리적인 설치 장소는 자유롭게 선택하세요.
+서버 기기에 PostgreSQL·첨부를 두고 다른 기기의 웹·AI 도구에서 접속하는 경로입니다. 이 가이드는 **Docker로 전용 PostgreSQL을 실행하고 네이티브 `oni-server` 서버를 실행**하는 구성을 기준으로 합니다. SQLite의 loopback 서버를 외부에 노출하는 방식은 아닙니다. 물리적인 설치 장소는 자유롭게 선택하세요.
 
 ## 1. 준비할 것
 
-- [설치 안내](README.md)의 지원 OS에 같은 버전 `oni`·`onidot-studio`를 설치합니다. 서버 기기의 터미널·파일·Docker 관리 권한이 필요합니다. 로컬 설치형의 OS별 검증 결과가 이 PostgreSQL·TLS 배치 전체를 검증한 결과는 아닙니다. 아래 구성으로 실제 로그인·문서·첨부·MCP·복구를 확인하세요.
+- [설치 안내](README.md)의 설치 스크립트에 `--server`를 붙여 Linux 서버 기기에 같은 버전 `oni`·`oni-server`를 설치합니다(`oni-server`는 Linux용만 냅니다). 서버 기기의 터미널·파일·Docker 관리 권한이 필요합니다. 로컬 설치형의 OS별 검증 결과가 이 PostgreSQL·TLS 배치 전체를 검증한 결과는 아닙니다. 아래 구성으로 실제 로그인·문서·첨부·MCP·복구를 확인하세요.
 - PostgreSQL용 Docker와, 공개 HTTPS를 제공할 역프록시를 준비합니다. 기존 DB와 역할을 공유하지 않는 전용 PostgreSQL을 사용합니다.
 - 예시 공개 주소 `https://studio.example.com` 대신 실제 도메인을 정하고 DNS를 서버로 연결합니다. 외부에는 역프록시의 HTTPS만 공개하고 DB 포트와 서버 내부 포트는 공개하지 않습니다.
 - 첫 주인은 서버의 설정 코드로 비밀번호 계정을 만듭니다. onidot 계정 로그인은 필요할 때 [선택 설정](#선택-onidot-계정-로그인)을 추가합니다.
@@ -48,8 +48,8 @@ volumes:
 ```sh
 docker compose up -d --wait db
 docker compose exec db createdb -U postgres onidot_studio
-onidot-studio bootstrap-sql modules > bootstrap-modules.sql
-onidot-studio bootstrap-sql gate > bootstrap-gate.sql
+oni-server bootstrap-sql modules > bootstrap-modules.sql
+oni-server bootstrap-sql gate > bootstrap-gate.sql
 docker compose exec -T db psql -X -U postgres -v ON_ERROR_STOP=1 \
   -d onidot_studio < bootstrap-modules.sql
 docker compose exec -T db psql -X -U postgres -v ON_ERROR_STOP=1 \
@@ -136,7 +136,7 @@ cd "$HOME/onidot-server"
 set -a
 . ./server.env
 set +a
-onidot-studio serve
+oni-server serve
 ```
 
 다른 터미널에서도 아래와 같이 같은 환경 파일을 읽은 뒤 확인합니다. 앞 터미널에서 설정한 환경은 새 터미널로 자동 전달되지 않습니다.
@@ -146,17 +146,17 @@ cd "$HOME/onidot-server"
 set -a
 . ./server.env
 set +a
-onidot-studio healthcheck
+oni-server healthcheck
 curl -fsS http://127.0.0.1:18081/ready
 curl -fsS https://studio.example.com/ready
-onidot-studio setup-code
+oni-server setup-code
 ```
 
 healthcheck 종료 0과 `/ready` HTTP 200은 DB·migration 준비를 뜻합니다. setup-code는 코드와 공개 `/setup` 주소를 출력합니다. 비밀 출력은 사용자만 보고 기록하지 않습니다. 접속할 기기의 브라우저로 `https://studio.example.com/setup`을 열어 24시간·1회용 코드와 이메일·표시 이름·비밀번호·비밀번호 확인을 입력해 첫 주인 계정을 만드세요. 비밀번호는 12~128자이며 계정 이메일과 같으면 사용할 수 없습니다. Space와 문서를 만들고 다시 읽으면 첫 사용 확인이 끝납니다.
 
-기동 시 설정 오류는 누락된 키를 고쳐 다시 실행합니다. 역할 인증 실패는 역할별 비밀번호와 파일을, storage 오류는 실제 절대경로·권한을 확인합니다. 이미 주인가 있으면 기존 계정으로 로그인합니다. 긴급 복구는 동일 환경의 서버 기기에서 `onidot-studio emergency-login`을 실행하고 출력 링크를 10분 안에 열어 확인합니다.
+기동 시 설정 오류는 누락된 키를 고쳐 다시 실행합니다. 역할 인증 실패는 역할별 비밀번호와 파일을, storage 오류는 실제 절대경로·권한을 확인합니다. 이미 주인가 있으면 기존 계정으로 로그인합니다. 긴급 복구는 동일 환경의 서버 기기에서 `oni-server emergency-login`을 실행하고 출력 링크를 10분 안에 열어 확인합니다.
 
-일상 운영에서는 자신의 서비스 관리자에 동일 사용자·환경·절대 바이너리 경로를 등록해 SIGTERM 정상 종료와 재시작을 관리하세요. 전경 예시는 터미널을 닫으면 상시 운영을 보장하지 않습니다. 로컬용 `oni daemon`은 이 PostgreSQL 서버의 서비스 관리 명령이 아닙니다.
+일상 운영에서는 자신의 서비스 관리자에 동일 사용자·환경·절대 바이너리 경로를 등록해 SIGTERM 정상 종료와 재시작을 관리하세요. 전경 예시는 터미널을 닫으면 상시 운영을 보장하지 않습니다. 로컬용 `oni local start|stop`은 이 PostgreSQL 서버의 서비스 관리 명령이 아닙니다.
 
 ### 계정·로그인 수단·구성원 관리
 
@@ -170,7 +170,7 @@ healthcheck 종료 0과 `/ready` HTTP 200은 DB·migration 준비를 뜻합니�
 
 주인은 `/settings/instance/people`에서 구성원 초대 링크를 만들고 복사해 전달합니다. 받은 사람은 링크를 열어 이메일·이름·비밀번호로 계정을 만듭니다. onidot 계정 로그인을 켰으면 그 방식으로도 가입할 수 있으며, 이메일을 지정한 초대는 검증된 onidot 이메일이 일치해야 합니다. 초대는 만료·일회용이며 메일 서버 없이 직접 전달할 수 있습니다. 기존 구성원의 비밀번호 복구에는 같은 관리 화면에서 24시간·일회용 재설정 링크를 만들어 전달합니다. 재설정을 마치면 그 계정의 기존 브라우저 세션을 끝내고 새 세션으로 로그인합니다. AI 연결·PAT는 유지되며, 필요하면 별도로 회수하세요.
 
-주인 계정에 접근할 수 없으면 서버 기기에서 같은 환경 설정을 읽고 `onidot-studio emergency-login`을 실행합니다. 출력된 10분·일회용 링크를 직접 열어 확인한 뒤 계정 설정에서 수단을 복구하세요. 비밀번호 수단이 꺼져 있으면 최근 비상 로그인한 주인에게 표시되는 **비밀번호 로그인 복구**에서 새 비밀번호 등록과 수단 활성화를 함께 확인합니다. 링크는 주인 계정에 접근하는 비밀이며 공유하거나 로그에 남기지 않습니다.
+주인 계정에 접근할 수 없으면 서버 기기에서 같은 환경 설정을 읽고 `oni-server emergency-login`을 실행합니다. 출력된 10분·일회용 링크를 직접 열어 확인한 뒤 계정 설정에서 수단을 복구하세요. 비밀번호 수단이 꺼져 있으면 최근 비상 로그인한 주인에게 표시되는 **비밀번호 로그인 복구**에서 새 비밀번호 등록과 수단 활성화를 함께 확인합니다. 링크는 주인 계정에 접근하는 비밀이며 공유하거나 로그에 남기지 않습니다.
 
 ### 선택: onidot 계정 로그인
 
@@ -189,6 +189,8 @@ ONIDOT_STUDIO_OIDC_CLIENT_SECRET_FILE="$HOME/onidot-server/secrets/oidc-client-s
 4. 새 환경으로 서버를 재시작하고 주인이 `/settings/instance/login`에서 onidot 계정 로그인을 켭니다. 설정 상태와 client 등록 바로가기를 확인하세요. 각 사용자는 `/settings/account`에서 최근 인증 후 자기 onidot 계정을 연결합니다.
 5. 로그인 화면에서 onidot 계정 로그인과 인스턴스로 돌아오는 흐름을 확인합니다. 이메일이 같다는 이유로 기존 인스턴스 계정에 자동 연결하지 않습니다.
 
+onidot 로그인 발급자가 기본값인 `https://accounts.onidot.com`이면 onidot 계정으로 로그인한 세션의 머리글에 「AI 작업」 링크가 보이며, 내 PC들의 AI 작업 현황을 보는 `https://aihub.onidot.com`으로 이동합니다. 인스턴스는 그 현황을 저장하지 않습니다. 다른 발급자를 쓰면 기본으로는 링크가 없습니다. 링크를 끄려면 `ONIDOT_STUDIO_AIHUB_URL=off`를, 다른 주소로 보내려면 `ONIDOT_STUDIO_AIHUB_URL=https://…`를 설정합니다.
+
 client 목록에서는 redirect URI 변경, secret 재발급, client 삭제를 관리합니다. secret을 재발급하면 서버의 비밀 파일도 교체하고 재시작하세요. client를 삭제하거나 연결을 끊기 전에 사용할 비밀번호 등 남은 수단을 확인합니다. 공개 주소는 HTTPS로 운영하며, 서버 설정만 성공했다고 실제 로그인이 검증된 것은 아닙니다.
 
 ### 문서·Space를 다른 사람과 공유하기
@@ -201,7 +203,7 @@ client 목록에서는 redirect URI 변경, secret 재발급, client 삭제를 �
 
 ## 5. 다른 기기의 AI 연결
 
-접속할 기기에도 [패키지](README.md)를 설치하고 사용할 Claude Code 또는 Codex가 설치·실행되는지 확인합니다. 원격 접속만 한다면 그 기기에서 `oni init`이나 로컬 daemon을 만들 필요가 없습니다.
+접속할 기기에도 [패키지](README.md)를 설치하고 사용할 Claude Code 또는 Codex가 설치·실행되는지 확인합니다. 원격 접속만 한다면 그 기기에서 `oni local init`이나 로컬 daemon을 만들 필요가 없습니다.
 
 ```sh
 oni connection add --alias remote --url https://studio.example.com/mcp --mode WRITE
@@ -217,7 +219,7 @@ claude.ai처럼 외부에서 접속하는 커넥터에는 **공개 HTTPS MCP URL
 
 ## 6. 백업과 복구
 
-`oni backup/restore`와 `onidot-studio local backup/restore`는 로컬 SQLite 전용입니다. PostgreSQL 서버에는 같은 의미의 top-level backup/restore 명령이 없습니다. DB와 첨부의 일관성을 위해 아래 수동 경로에서는 **서버·worker를 완전히 중지한 동안 둘을 복사**합니다. 사용하는 서비스 관리자의 자동 재시작도 먼저 중지하세요.
+`oni local backup/restore`와 `oni-local backup/restore`는 로컬 SQLite 전용입니다. PostgreSQL 서버에는 같은 의미의 top-level backup/restore 명령이 없습니다. DB와 첨부의 일관성을 위해 아래 수동 경로에서는 **서버·worker를 완전히 중지한 동안 둘을 복사**합니다. 사용하는 서비스 관리자의 자동 재시작도 먼저 중지하세요.
 
 1. 전경 서버라면 그 터미널에서 Ctrl-C로 정상 종료하고 프로세스 종료를 기다립니다. `/ready`가 더 이상 응답하지 않으며 서버가 storage를 쓰지 않는지 확인합니다. DB는 계속 실행합니다.
 2. 서버 폴더에서 새 백업 디렉터리를 만들고 덤프와 첨부를 보관합니다.
@@ -261,9 +263,24 @@ tar -xzf "$backup_dir/storage.tar.gz" -C "$HOME/onidot-server/storage-restored"
 
 실패하면 새 서버를 멈추고 이전 바이너리와 **업데이트 전 백업**을 새 DB·storage에 복구합니다. 새 버전이 migration한 DB를 이전 바이너리로 바로 열지 마세요. 이전 DB·storage·이미지·패키지를 성공 확인 전 삭제하지 않습니다.
 
-컨테이너 서버를 쓰려면 해당 공개 릴리스가 제공하는 검증된 이미지 주소·digest를 사용합니다. 이미지 안 명령은 `/usr/local/bin/onidot-studio serve`, listener는 `0.0.0.0:8080`, 실행 UID/GID는 `10001:10001`, 기본 storage는 `/data/storage`입니다. volume과 secret 파일을 그 UID가 읽고 필요한 storage에 쓰도록 준비해야 합니다. 현재 문서의 네이티브 서버 예시를 그대로 Docker env·파일 경로에 복사하면 안 됩니다. 공개 이미지 주소는 출시 공지에서 확인하며 아직 없는 registry 주소를 추정하지 않습니다.
+컨테이너 서버를 쓰려면 해당 공개 릴리스가 제공하는 검증된 이미지 주소·digest를 사용합니다. 이미지 안 명령은 `/usr/local/bin/oni-server serve`(이번 출시 동안 옛 경로 `/usr/local/bin/onidot-studio`는 그 링크로 남습니다), listener는 `0.0.0.0:8080`, 실행 UID/GID는 `10001:10001`, 기본 storage는 `/data/storage`입니다. volume과 secret 파일을 그 UID가 읽고 필요한 storage에 쓰도록 준비해야 합니다. 현재 문서의 네이티브 서버 예시를 그대로 Docker env·파일 경로에 복사하면 안 됩니다. 공개 이미지 주소는 출시 공지에서 확인하며 아직 없는 registry 주소를 추정하지 않습니다.
 
 제거할 때는 서버 서비스를 중지·해제하고 클라이언트에서 해당 연결만 로그아웃·등록 해제합니다. 서버 실행 파일 제거와 DB·storage·secret·백업 삭제를 분리하세요. `docker compose down -v`는 DB volume을 삭제하므로 일반 제거 절차에 포함하지 않습니다. 다시 쓸 수 있도록 데이터를 기본 보존하고 삭제는 사용자가 별도로 결정합니다.
+
+### 0.1.x 네이티브 서버에서 올리기
+
+0.1.x는 한 압축 파일에 `oni`와 서버 `onidot-studio`를 함께 설치했습니다. 다음 출시(0.2.0)부터 서버 실행 파일 이름은 `oni-server`입니다. 이 기기에 로컬 인스턴스 설정(`instance.json`)이 없으면 설치 스크립트가 기존 설치를 서버 설치로 보고 이행합니다.
+
+```sh
+# 서비스 관리자에서 서버를 멈춘 뒤, 같은 설치 폴더로 실행합니다.
+bash install.sh --base-url "$release_base" --version <새 버전> --bin-dir "$HOME/.local/bin" --restart
+oni-server version
+onidot-studio version
+```
+
+기대 결과: 설치 출력에 「서버 설치로 이행했습니다」 한 줄이 나오고, 설치 폴더에 `oni`·`oni-server`·`onidot-studio`가 있습니다. 두 version은 같은 새 버전입니다. `onidot-studio`는 이번 출시 동안 남기는 `oni-server`의 호환 파일(같은 파일)이라 서비스 정의의 `onidot-studio serve`와 운영 명령은 그대로 동작합니다. 다음 출시 전에 서비스 정의의 실행 파일을 `oni-server`로 바꾸세요. 데이터·환경 파일·PostgreSQL은 바뀌지 않습니다. 이 기기에서 로컬 인스턴스도 쓴다면(`instance.json`이 있으면) 대신 `oni-local`로 이행하므로, 서버 운영 기기와 로컬 인스턴스 기기는 나누는 것을 권장합니다.
+
+컨테이너 이미지는 `/usr/local/bin/oni-server`를 담고, 이번 출시 동안 옛 경로 `/usr/local/bin/onidot-studio`를 그 링크로 둡니다. compose의 healthcheck·bootstrap-sql이 옛 경로를 불러도 동작하지만 다음 출시 전에 `oni-server`로 바꾸세요.
 
 ### 작업 원장과 가이드 모듈
 
@@ -271,12 +288,14 @@ tar -xzf "$backup_dir/storage.tar.gz" -C "$HOME/onidot-server/storage-restored"
 
 ```sh
 ONIDOT_STUDIO_INSTALLED_MODULES=core,wiki,guide,ledger \
-  onidot-studio bootstrap-sql p2 > bootstrap-p2.sql
+  oni-server bootstrap-sql p2 > bootstrap-p2.sql
 docker compose exec -T db psql -X -U postgres -v ON_ERROR_STOP=1 \
   -d onidot_studio < bootstrap-p2.sql
 ```
 
 추가 역할 `onidot_guide`·`onidot_ledger`에 각기 다른 비밀번호를 설정하고 `0600` 파일로 보관합니다. 서버 환경에 `ONIDOT_STUDIO_DB_GUIDE_PASSWORD_FILE`·`ONIDOT_STUDIO_DB_LEDGER_PASSWORD_FILE`을 지정하고 `ONIDOT_STUDIO_INSTALLED_MODULES=core,wiki,guide,ledger`로 설정합니다. `ONIDOT_STUDIO_MODULES`에는 활성화할 모듈을 넣습니다. 비밀번호를 명령 인자나 로그에 넣지 마세요.
+
+AI 작업 기록은 이제 각 PC의 `oni` 런타임(MCP 서버 `onidot-work`)에 남습니다. Studio의 작업 원장은 기본으로 읽기 전용입니다. 이미 남은 작업·단계·증거·판정·인계는 웹 「작업」과 원장 조회 API로 볼 수 있고, `oni work import`가 이 조회 API로 각 PC에 가져갑니다. 쓰기 API·쓰기 MCP 도구·수집기 경로는 열리지 않고(404), 6시간 비활동 멈춤도 돌지 않습니다. Space별 「현황」과 `get_work_activity`는 없어졌습니다. `ONIDOT_STUDIO_LEDGER_READ_ONLY=false`는 문제가 생겼을 때 이전 동작으로 되돌리는 설정이며, 평소에는 지정하지 않습니다.
 
 기능을 꺼도 설치 로스터와 역할 비밀번호는 보존해야 기존 정본을 계속 읽을 수 있습니다. 기존 Wiki 연결에 추가 모듈 권한이 자동 부여되지 않으므로 원장·가이드를 사용할 때는 OAuth 동의에서 필요한 권한을 선택합니다.
 
