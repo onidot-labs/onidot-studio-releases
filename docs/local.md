@@ -20,6 +20,13 @@ studio="$HOME/.local/bin/onidot-studio"
 - `local status`: 서비스·연결·권한 준비 상태를 따로 보고합니다. 아무것도 만들거나 기동하지 않습니다.
 - `local open`: 이 Mac에서만(127.0.0.1) 웹 화면을 열고 Ctrl-C로 닫습니다. 로그인 대신 60초·1회용 링크로 브라우저를 엽니다. `--no-browser`는 링크를 표준 오류로만 출력합니다. 링크를 다른 사람에게 보내지 않습니다.
 
+### 새 버전으로 올리기
+
+새 버전을 설치한 뒤 `local install`을 다시 실행합니다. 0.3.3부터는 설치된 로컬 Wiki의 실행 파일이 새 배포물과 다르면 같은 자료를 유지한 채 새 실행 파일로 바꿉니다(결과의 `wikiAction`이 `update`). 0.3.2 이하는 이미 설치된 로컬 Wiki를 그대로 다시 써서, 다시 설치해도 실행 파일이 바뀌지 않았습니다.
+
+- 바뀐 뒤에는 로컬 Wiki의 주소와 접속 토큰이 새로 정해집니다. 열려 있던 AI 세션은 MCP를 다시 연결하거나 새로 엽니다.
+- 0.3.0 실행 파일로 돌던 로컬 Wiki는 새 실행 파일이 처음 뜰 때 옛 AI 기록·지침 표를 지웁니다. 문서·첨부·이력은 그대로입니다. 옛 AI 기록을 아직 Knowledge로 옮기지 않았다면 먼저 [백업](#4-백업과-복원)합니다. 백업이 거부되면 `local stop` 뒤 `~/Library/Application Support/onidot/data/services/storage/` 아래 Wiki 저장소 폴더를 그대로 복사해 둡니다.
+
 ## 2. AI 클라이언트 연결
 
 로컬 Wiki의 MCP는 stdio 명령 `onidot-studio local mcp`입니다. 실행할 때마다 로컬 Wiki를 준비하고 현재 주소로 연결합니다. onidot-studio 플러그인은 `local install`이 등록한 연결 프로필을 씁니다. 직접 등록할 때는 다음처럼 합니다.
