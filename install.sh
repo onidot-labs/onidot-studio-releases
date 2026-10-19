@@ -3,7 +3,7 @@
 # 이 기기용 Self-host 배포물(bundle)을 내려받아 SHA256SUMS로 검증한 뒤, 그 배포물에 든 install.sh로
 # launcher(onidot-studio)를 설치합니다. 데이터 폴더·DB·셸 설정은 바꾸지 않습니다.
 #
-#   sh install.sh --version 0.3.1 [--base-url URL] [--prefix DIR] [--replace-legacy]
+#   sh install.sh --version 0.3.2 [--base-url URL] [--prefix DIR] [--replace-legacy]
 #
 # 0.2.x까지의 oni·oni-local·oni-server는 0.3.0부터 없습니다. 옛 설치 인자(--local·--server·--bin-dir·
 # --update·--no-restart)로 부르면 아무것도 바꾸지 않고 안내한 뒤 끝냅니다.
@@ -42,7 +42,7 @@ done
 
 case "$VERSION" in
   [0-9]*.[0-9]*.[0-9]*) ;;
-  *) die '--version x.y.z가 필요합니다(예: --version 0.3.1)';;
+  *) die '--version x.y.z가 필요합니다(예: --version 0.3.2)';;
 esac
 case "$VERSION" in *[!0-9.]*) die "버전 형식이 아닙니다: $VERSION";; esac
 [ -n "$BASE_URL" ] || BASE_URL="$REPO_URL/releases/download/v$VERSION"
