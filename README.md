@@ -9,18 +9,18 @@ Onidot Studio는 사람이 관리하는 문서(Wiki)와 연결한 AI의 개인 �
 
 작업 기록·지침·PC 런타임은 [Onidot Orbit](https://orbit.onidot.com)(`oni`)이 맡습니다. 공통 오류는 [문제 해결](docs/troubleshooting.md)을 보세요.
 
-현재 공개 버전은 **0.3.0**입니다. 설치 파일은 [공개 릴리스](https://github.com/onidot-labs/onidot-studio-releases/releases/tag/v0.3.0)에서 받습니다.
+현재 공개 버전은 **0.3.1**입니다. 설치 파일은 [공개 릴리스](https://github.com/onidot-labs/onidot-studio-releases/releases/tag/v0.3.1)에서 받습니다.
 
 ## 0.2.x에서 바뀐 점
 
 - 실행 파일 `oni`·`oni-local`·`oni-server`와 `oni update`가 없어지고 `onidot-studio` 하나가 됐습니다. `oni` 이름은 Onidot Orbit이 씁니다.
 - 지침(guide)·작업 원장(ledger)·AI 기록(remember·recall)은 Studio에서 빠졌습니다. 작업 기록은 Orbit, AI 기억은 개인 Knowledge(`knowledge_*` 도구)를 씁니다.
-- 옛 로컬 인스턴스(`oni local`)의 문서는 [로컬 단독 모드](docs/local.md)의 「옛 oni local에서 옮기기」로 가져옵니다. 0.2.x의 `oni update`로는 0.3.0으로 올라가지 않습니다(설치 스크립트가 아무것도 바꾸지 않고 안내만 합니다).
+- 옛 로컬 인스턴스(`oni local`)의 문서는 [로컬 단독 모드](docs/local.md)의 「옛 oni local에서 옮기기」로 가져옵니다. 0.2.x의 `oni update`로는 0.3.x로 올라가지 않습니다(설치 스크립트가 아무것도 바꾸지 않고 안내만 합니다).
 
 ## 빠른 설치(macOS Apple Silicon)
 
 ```sh
-version=0.3.0
+version=0.3.1
 base="https://github.com/onidot-labs/onidot-studio-releases/releases/download/v$version"
 work=$(mktemp -d) && cd "$work"
 curl -fsSLO "$base/install.sh"
@@ -28,7 +28,7 @@ sh install.sh --version "$version"
 "$HOME/.local/bin/onidot-studio" version
 ```
 
-기대 결과: `설치 완료: onidot-studio 0.3.0 (darwin-arm64)`. 설치 스크립트는 배포물을 `SHA256SUMS`로 검증한 뒤 `~/.local/bin/onidot-studio` launcher와 `~/.local/lib/onidot/studio/releases/…` 실행물을 둡니다. `sudo`·셸 설정 변경은 하지 않습니다. 같은 prefix의 Orbit `oni`는 바꾸지 않습니다.
+기대 결과: `설치 완료: onidot-studio 0.3.1 (darwin-arm64)`. 설치 스크립트는 배포물을 `SHA256SUMS`로 검증한 뒤 `~/.local/bin/onidot-studio` launcher와 `~/.local/lib/onidot/studio/releases/…` 실행물을 둡니다. `sudo`·셸 설정 변경은 하지 않습니다. 같은 prefix의 Orbit `oni`는 바꾸지 않습니다.
 
 0.2.x 이하가 같은 폴더에 둔 `onidot-studio` 파일이 있으면 설치가 거부됩니다. 옛 설치를 정리할 준비가 됐으면 `sh install.sh --version "$version" --replace-legacy`로 옛 파일을 `~/.local/lib/onidot/studio/legacy/`에 옮겨 보존한 뒤 설치합니다.
 
