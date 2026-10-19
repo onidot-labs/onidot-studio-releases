@@ -29,6 +29,15 @@ claude mcp add onidot-local -- "$HOME/.local/bin/onidot-studio" local mcp
 codex mcp add onidot-local -- "$HOME/.local/bin/onidot-studio" local mcp
 ```
 
+### 문서 나누기와 파일 첨부(0.3.1부터)
+
+- **Space 여러 개**: AI에게 `create_space`로 Space를 만들게 하면 프로젝트별로 문서를 나눠 둘 수 있습니다. 혼자 쓰는 분류용이라 구성원·권한·공유는 없습니다.
+- **파일 경로로 첨부**: AI가 `attach_local_file`에 이 Mac의 파일 절대경로를 주면 로컬 Wiki가 파일을 직접 읽어 페이지에 붙입니다. 큰 PDF도 curl 없이 한 번에 붙습니다.
+  - 홈 폴더 안의 일반 파일만 읽습니다.
+  - `~/.ssh`·키체인·브라우저 프로필·AI 에이전트 설정(`~/.claude`·`~/.codex`) 같은 비밀 위치와 onidot 저장소는 항상 거부합니다.
+  - 거부되면 AI가 다른 경로로 우회하지 않고 알려 줍니다.
+- 기존 업로드 방식(`create_attachment_upload` 다음 curl)도 그대로 씁니다. 0.3.0에서 로컬 모드의 curl 업로드가 401로 막히던 문제는 0.3.1에서 고쳤습니다.
+
 ## 3. 옛 oni local에서 옮기기
 
 0.2.x까지의 로컬 인스턴스(`oni local`, 실행 파일 `oni-local`)의 Wiki 문서·첨부를 새 로컬 Wiki로 가져옵니다. **새 로컬 Wiki를 처음 설치(`local install`)하기 전에** 한 번만 실행합니다. 이미 문서가 있는 로컬 Wiki와는 합치지 않고 거부합니다.
