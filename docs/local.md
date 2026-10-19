@@ -24,12 +24,12 @@ studio="$HOME/.local/bin/onidot-studio"
 
 새 버전을 설치한 뒤 `local install`을 다시 실행합니다. 0.3.3부터는 설치된 로컬 Wiki의 실행 파일이 새 배포물과 다르면 같은 자료를 유지한 채 새 실행 파일로 바꿉니다(결과의 `wikiAction`이 `update`). 0.3.2 이하는 이미 설치된 로컬 Wiki를 그대로 다시 써서, 다시 설치해도 실행 파일이 바뀌지 않았습니다.
 
-- 바뀐 뒤에는 로컬 Wiki의 주소와 접속 토큰이 새로 정해집니다. 열려 있던 AI 세션은 MCP를 다시 연결하거나 새로 엽니다.
+- 바뀐 뒤에는 로컬 Wiki의 주소와 접속 토큰이 새로 정해집니다. 0.3.4부터는 열려 있던 AI 세션이 새 주소·토큰을 스스로 따라가므로 MCP를 다시 연결하지 않아도 됩니다. 0.3.3 이하로 열어 둔 세션은 옛 연결 방식이라, 그 세션을 쓰는 중에 Wiki가 바뀌면 한 번만 새로 엽니다.
 - 0.3.0 실행 파일로 돌던 로컬 Wiki는 새 실행 파일이 처음 뜰 때 옛 AI 기록·지침 표를 지웁니다. 문서·첨부·이력은 그대로입니다. 옛 AI 기록을 아직 Knowledge로 옮기지 않았다면 먼저 [백업](#4-백업과-복원)합니다. 백업이 거부되면 `local stop` 뒤 `~/Library/Application Support/onidot/data/services/storage/` 아래 Wiki 저장소 폴더를 그대로 복사해 둡니다.
 
 ## 2. AI 클라이언트 연결
 
-로컬 Wiki의 MCP는 stdio 명령 `onidot-studio local mcp`입니다. 실행할 때마다 로컬 Wiki를 준비하고 현재 주소로 연결합니다. onidot-studio 플러그인은 `local install`이 등록한 연결 프로필을 씁니다. 직접 등록할 때는 다음처럼 합니다.
+로컬 Wiki의 MCP는 stdio 명령 `onidot-studio local mcp`입니다. 실행할 때 로컬 Wiki를 준비하고, 연결해 둔 동안 Wiki가 새 버전으로 바뀌거나 다시 시작되면 새 주소·토큰으로 따라갑니다. 등록된 채 멈춘 Wiki는 다음 호출 때 다시 띄웁니다. onidot-studio 플러그인은 `local install`이 등록한 연결 프로필을 씁니다. 직접 등록할 때는 다음처럼 합니다.
 
 ```sh
 claude mcp add onidot-local -- "$HOME/.local/bin/onidot-studio" local mcp
@@ -83,6 +83,6 @@ codex mcp add onidot-local -- "$HOME/.local/bin/onidot-studio" local mcp
 
 ## 5. 멈추기와 제거
 
-`local stop`은 Studio의 사용 등록만 해제하고, 다른 소비자(예: Orbit)가 없을 때만 로컬 Wiki를 정지합니다. 자료는 지우지 않습니다. AI 클라이언트가 `local mcp`를 실행하면 다시 뜹니다.
+`local stop`은 Studio의 사용 등록만 해제하고, 다른 소비자(예: Orbit)가 없을 때만 로컬 Wiki를 정지합니다. 자료는 지우지 않습니다. 열려 있는 AI 세션은 멈춘 Wiki를 되살리지 않습니다. AI 클라이언트가 `local mcp`를 새로 실행하거나 `local install`·`local open`으로 다시 띄우면 열려 있던 세션도 이어집니다.
 
 launcher를 지울 때도 로컬 Wiki 자료는 남습니다. 자료까지 지우려면 먼저 백업을 확인한 뒤 직접 지웁니다.
