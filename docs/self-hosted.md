@@ -31,17 +31,17 @@ studio="$HOME/.local/bin/onidot-studio"
 ### Linux 컨테이너
 
 ```sh
-base=https://github.com/onidot-labs/onidot-studio-releases/releases/download/v0.3.1
+base=https://github.com/onidot-labs/onidot-studio-releases/releases/download/v0.3.2
 mkdir onidot-studio-image && cd onidot-studio-image
 curl -fsSLO "$base/SHA256SUMS"
-curl -fsSLO "$base/onidot-studio-selfhost-0.3.1-linux-arm64-container.tar.gz"
+curl -fsSLO "$base/onidot-studio-selfhost-0.3.2-linux-arm64-container.tar.gz"
 curl -fsSLO "$base/Dockerfile"
 curl -fsSLO "$base/compose.example.yaml"
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf onidot-studio-selfhost-0.3.1-linux-arm64-container.tar.gz
+tar -xzf onidot-studio-selfhost-0.3.2-linux-arm64-container.tar.gz
 docker buildx build --platform linux/arm64 \
-  --build-context bundle=onidot-studio-selfhost-0.3.1-linux-arm64-container \
-  --build-arg VERSION=0.3.1 -f Dockerfile -t onidot-studio-selfhost:0.3.1 --load .
+  --build-context bundle=onidot-studio-selfhost-0.3.2-linux-arm64-container \
+  --build-arg VERSION=0.3.2 -f Dockerfile -t onidot-studio-selfhost:0.3.2 --load .
 ```
 
 설치 설정에는 `"runtime": "compose"`, `"listen": "0.0.0.0:8080"`, `publicOrigin`, `"blobRoot": "/data/storage"`를 둡니다. 서비스와 일회성 설치기 컨테이너는 같은 이미지를 쓰며, 비밀 디렉터리 배치·네트워크·외부 접근은 배포물 `README.md`의 「compose 실행 모드」를 따릅니다. x86_64 서버는 `linux-amd64-container` 배포물과 `--platform linux/amd64`를 씁니다.
