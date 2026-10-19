@@ -21,6 +21,7 @@
 - `local status`로 서비스·연결·권한 상태를 따로 확인합니다. 한 부분만 실패해도 나머지는 그대로 보고합니다.
 - `import-oni-local`이 "이미 Wiki가 있다"로 거부: 새 로컬 Wiki를 이미 설치했습니다. 가져오기는 첫 설치 전에만 됩니다.
 - `local backup`이 다른 소비자 때문에 거부: Orbit 등 다른 프로그램이 로컬 Wiki를 쓰는 중입니다. 그 사용을 멈춘 뒤 다시 실행합니다.
+- AI 세션의 로컬 Wiki 도구가 "인스턴스 MCP에 연결할 수 없습니다"로 실패: `local status`로 Wiki가 멈췄는지 봅니다. `local stop`·`local backup`이 멈춘 Wiki는 열린 세션이 되살리지 않습니다. `local install`이나 `local open`으로 다시 띄우면 0.3.4 이상에서 연 세션은 재연결 없이 이어집니다. 0.3.3 이하에서 연 세션은 한 번 새로 엽니다.
 - 새 버전으로 `local install`을 다시 해도 로컬 Wiki가 옛 판 그대로(`wikiAction`이 `reuse`): 0.3.2 이하 설치 도구의 결함입니다. 0.3.3 이상을 설치해 `local install`을 다시 실행하면 새 실행 파일로 바뀝니다([새 버전으로 올리기](local.md#새-버전으로-올리기)).
 
 ## Self-host 서버
